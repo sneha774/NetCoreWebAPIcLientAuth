@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NetCoreWebAPIcLientAuth.Data;
 using NetCoreWebAPIcLientAuth.Mappers;
 using NetCoreWebAPIcLientAuth.ViewModels.Stock;
@@ -17,17 +18,17 @@ namespace NetCoreWebAPIcLientAuth.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var stocks = _context.Stocks.ToList()                                       // ToList is the defered execution
-                .Select(s => s.ToStockViewModel());
+            var stocksModel = await _context.Stocks.ToListAsync(); // ToList is the defered execution
+            var stocks = stocksModel.Select(s => s.ToStockViewModel());
             return Ok(stocks);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById([FromRoute]int id)
+        public async Task<IActionResult> GetById([FromRoute]int id)
         {
-            var stock = _context.Stocks.Find(id);
+            var stock = await _context.Stocks.FindAsync(id);
             if(stock == null)
             {
                 return NotFound();
@@ -36,19 +37,19 @@ namespace NetCoreWebAPIcLientAuth.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] StockCreateRequestVM stockCreateRequest)
+        public async Task<IActionResult> Create([FromBody] StockCreateRequestVM stockCreateRequest)
         {
             var stock = stockCreateRequest.ToStockFromCreateRequestViewModel();
-            _context.Stocks.Add(stock);                                                 // Starts tracking the entitiy to be saved
-            _context.SaveChanges();                                                     // Saves the tracked changes in the database
+            await _context.Stocks.AddAsync(stock);                                                 // Starts tracking the entitiy to be saved
+            await _context.SaveChangesAsync();                                                     // Saves the tracked changes in the database
             return CreatedAtAction(nameof(GetById), new { id = stock.Id }, stock);
         }
 
         [HttpPut]
         [Route("{id}")]
-        public IActionResult Update([FromRoute] int id, [FromBody] StockUpdateRequestVM stockUpdateRequest)
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] StockUpdateRequestVM stockUpdateRequest)
         {
-            var stock  = _context.Stocks.FirstOrDefault(s => s.Id == id);               // EF retrieves the object and starts tracking it
+            var stock  = await _context.Stocks.FirstOrDefaultAsync(s => s.Id == id);               // EF retrieves the object and starts tracking it
             if (stock == null)
             {
                 return NotFound();
@@ -61,23 +62,23 @@ namespace NetCoreWebAPIcLientAuth.Controllers
             stock.LastDiv = stockUpdateRequest.LastDiv;
             stock.MarketCap = stockUpdateRequest.MarketCap;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return Ok(stock.ToStockViewModel());
         }
 
         [HttpDelete]
         [Route("{id}")]
-        public IActionResult Delete([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            var stock = _context.Stocks.FirstOrDefault(s => s.Id == id);
+            var stock = await _context.Stocks.FirstOrDefaultAsync(s => s.Id == id);
             if(stock == null)
             {
                 return NotFound();
             }
 
             _context.Stocks.Remove(stock);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             
             return NoContent();                                                     // No Error is a good news
         }
