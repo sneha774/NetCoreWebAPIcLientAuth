@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NetCoreWebAPIcLientAuth.Data;
+using NetCoreWebAPIcLientAuth.Interfaces;
+using NetCoreWebAPIcLientAuth.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,10 +12,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Dependency Injection
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+builder.Services.AddScoped<IStockRepository, StockRepository>();
 
 var app = builder.Build();
 

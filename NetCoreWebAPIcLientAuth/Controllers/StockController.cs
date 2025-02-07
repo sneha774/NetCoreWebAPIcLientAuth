@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetCoreWebAPIcLientAuth.Data;
+using NetCoreWebAPIcLientAuth.Interfaces;
 using NetCoreWebAPIcLientAuth.Mappers;
 using NetCoreWebAPIcLientAuth.ViewModels.Stock;
 
@@ -10,25 +11,25 @@ namespace NetCoreWebAPIcLientAuth.Controllers
     [ApiController]
     public class StockController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IStockRepository _stockRepo;
 
-        public StockController(ApplicationDbContext context)
+        public StockController(ApplicationDbContext context, IStockRepository stockRepo)
         {
-            _context = context;
+            _stockRepo = stockRepo;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var stocksModel = await _context.Stocks.ToListAsync(); // ToList is the defered execution
-            var stocks = stocksModel.Select(s => s.ToStockViewModel());
-            return Ok(stocks);
+            var stocks = await _stockRepo.GetAllAsync();
+            var stocksViewModel = stocks.Select(s => s.ToStockViewModel());
+            return Ok(stocksViewModel);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute]int id)
         {
-            var stock = await _context.Stocks.FindAsync(id);
+            var stock = await _stockRepo.GetByIdAsync(id);
             if(stock == null)
             {
                 return NotFound();
@@ -40,29 +41,19 @@ namespace NetCoreWebAPIcLientAuth.Controllers
         public async Task<IActionResult> Create([FromBody] StockCreateRequestVM stockCreateRequest)
         {
             var stock = stockCreateRequest.ToStockFromCreateRequestViewModel();
-            await _context.Stocks.AddAsync(stock);                                                 // Starts tracking the entitiy to be saved
-            await _context.SaveChangesAsync();                                                     // Saves the tracked changes in the database
-            return CreatedAtAction(nameof(GetById), new { id = stock.Id }, stock);
+            await _stockRepo.CreateAsync(stock);
+            return CreatedAtAction(nameof(GetById), new { id = stock.Id }, stock.ToStockViewModel());
         }
 
         [HttpPut]
         [Route("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] StockUpdateRequestVM stockUpdateRequest)
         {
-            var stock  = await _context.Stocks.FirstOrDefaultAsync(s => s.Id == id);               // EF retrieves the object and starts tracking it
+            var stock  = await _stockRepo.UpdateAsync(id, stockUpdateRequest);
             if (stock == null)
             {
                 return NotFound();
             }
-
-            stock.Symbol = stockUpdateRequest.Symbol;                                   // Hence, we have to update the same object.
-            stock.Company = stockUpdateRequest.Company;
-            stock.Industry = stockUpdateRequest.Industry;
-            stock.Purchase = stockUpdateRequest.Purchase;
-            stock.LastDiv = stockUpdateRequest.LastDiv;
-            stock.MarketCap = stockUpdateRequest.MarketCap;
-
-            await _context.SaveChangesAsync();
 
             return Ok(stock.ToStockViewModel());
         }
@@ -71,16 +62,13 @@ namespace NetCoreWebAPIcLientAuth.Controllers
         [Route("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            var stock = await _context.Stocks.FirstOrDefaultAsync(s => s.Id == id);
+            var stock = await _stockRepo.DeleteAsync(id);
             if(stock == null)
             {
                 return NotFound();
             }
-
-            _context.Stocks.Remove(stock);
-            await _context.SaveChangesAsync();
             
-            return NoContent();                                                     // No Error is a good news
+            return NoContent();  // No Error is a good news
         }
     }
 }
