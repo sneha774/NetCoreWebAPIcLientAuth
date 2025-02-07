@@ -1,5 +1,6 @@
 ﻿using NetCoreWebAPIcLientAuth.DTOs.Stock;
 using NetCoreWebAPIcLientAuth.Models;
+using NetCoreWebAPIcLientAuth.ViewModels.Stock;
 
 namespace NetCoreWebAPIcLientAuth.Mappers
 {
@@ -19,5 +20,21 @@ namespace NetCoreWebAPIcLientAuth.Mappers
             };
             return stockvm;
         }
+
+        public static Stock ToStockFromCreateRequestViewModel(this StockCreateRequestVM stockCreateRequest)
+        {
+            var stock = new Stock
+            {
+                Symbol = stockCreateRequest.Symbol,
+                Company = stockCreateRequest.Company,
+                Industry = stockCreateRequest.Industry,
+                Purchase = stockCreateRequest.Purchase,
+                LastDiv = stockCreateRequest.LastDiv,
+                MarketCap = stockCreateRequest.MarketCap,
+            };
+            return stock;
+        }
+
+
     }
 }
