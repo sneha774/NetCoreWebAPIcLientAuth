@@ -18,12 +18,12 @@ namespace NetCoreWebAPIcLientAuth.Repository
 
         public async Task<List<Stock>> GetAllAsync()
         {
-            return await _context.Stocks.ToListAsync(); // ToList is the defered execution
+            return await _context.Stocks.Include(s => s.Comments).ToListAsync(); // ToList is the defered execution
         }
 
         public async Task<Stock?> GetByIdAsync(int id)
         {
-            return await _context.Stocks.FindAsync(id);
+            return await _context.Stocks.Include(s => s.Comments).FirstOrDefaultAsync(s => s.Id == id);
         }
         public async Task<Stock> CreateAsync(Stock stock)
         {
@@ -63,6 +63,11 @@ namespace NetCoreWebAPIcLientAuth.Repository
             await _context.SaveChangesAsync();
 
             return stock;
+        }
+
+        public Task<bool> StockExists(int id)
+        {
+            return _context.Stocks.AnyAsync(s => s.Id == id);
         }
     }
 }

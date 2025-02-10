@@ -14,5 +14,7 @@ namespace NetCoreWebAPIcLientAuth.Interfaces
         Task<Stock?> UpdateAsync(int id, StockUpdateRequestVM stockUpdateModel);
 
         Task<Stock?> DeleteAsync(int id);
+
+        Task<bool> StockExists(int id);
     }
 }

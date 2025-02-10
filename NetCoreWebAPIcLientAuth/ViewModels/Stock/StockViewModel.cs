@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using NetCoreWebAPIcLientAuth.Models;
+using NetCoreWebAPIcLientAuth.ViewModels.Comment;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NetCoreWebAPIcLientAuth.DTOs.Stock
 {
@@ -14,5 +16,6 @@ namespace NetCoreWebAPIcLientAuth.DTOs.Stock
         public decimal LastDiv { get; set; }
 
         public long MarketCap { get; set; }
+        public List<CommentViewModel> Comments { get; set; } = new List<CommentViewModel>();
     }
 }

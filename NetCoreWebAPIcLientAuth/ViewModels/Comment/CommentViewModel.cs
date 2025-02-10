@@ -1,6 +1,6 @@
-﻿namespace NetCoreWebAPIcLientAuth.Models
+﻿namespace NetCoreWebAPIcLientAuth.ViewModels.Comment
 {
-    public class Comment
+    public class CommentViewModel
     {
         public int Id { get; set; }
         public string Title { get; set; } = string.Empty;
@@ -9,6 +9,5 @@
 
         // Relationships
         public int? StockId { get; set; } // Foreign Key
-        public Stock? Stock { get; set; } // Navigation Property.
     }
 }

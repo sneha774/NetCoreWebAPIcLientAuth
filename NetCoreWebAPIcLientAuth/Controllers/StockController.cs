@@ -22,8 +22,8 @@ namespace NetCoreWebAPIcLientAuth.Controllers
         public async Task<IActionResult> GetAll()
         {
             var stocks = await _stockRepo.GetAllAsync();
-            var stocksViewModel = stocks.Select(s => s.ToStockViewModel());
-            return Ok(stocksViewModel);
+            var stocksVM = stocks.Select(s => s.ToStockViewModel());
+            return Ok(stocksVM);
         }
 
         [HttpGet("{id}")]
