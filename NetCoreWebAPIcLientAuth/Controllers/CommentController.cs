@@ -27,7 +27,7 @@ namespace NetCoreWebAPIcLientAuth.Controllers
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             var comment = await _commentRepo.GetByIdAsync(id);
@@ -42,7 +42,9 @@ namespace NetCoreWebAPIcLientAuth.Controllers
         [Route("{stockId}")]
         public async Task<IActionResult> Create([FromRoute] int stockId, [FromBody] CommentCreateRequestVM createCommentRequest)
         {
-            if(!await _stockRepo.StockExists(stockId))
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (!await _stockRepo.StockExists(stockId))
             {
                 return BadRequest($"Stock with id {stockId} does not exist");
             }
@@ -53,9 +55,11 @@ namespace NetCoreWebAPIcLientAuth.Controllers
         }
 
         [HttpPut]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] CommentUpdateRequestVM updateCommentRequest)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var comment = await _commentRepo.UpdateAsync(id, updateCommentRequest.ToCommentFromUpdateVM());
             if(comment == null)
             {  
@@ -66,7 +70,7 @@ namespace NetCoreWebAPIcLientAuth.Controllers
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             var comment = await _commentRepo.DeleteAsync(id);
