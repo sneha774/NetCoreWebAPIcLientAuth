@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using NetCoreWebAPIcLientAuth.Data;
+using NetCoreWebAPIcLientAuth.Helpers;
 using NetCoreWebAPIcLientAuth.Interfaces;
 using NetCoreWebAPIcLientAuth.Models;
 using NetCoreWebAPIcLientAuth.ViewModels.Stock;
@@ -16,9 +17,26 @@ namespace NetCoreWebAPIcLientAuth.Repository
             _context = context;
         }
 
-        public async Task<List<Stock>> GetAllAsync()
+        public async Task<List<Stock>> GetAllAsync(QueryObject query)
         {
-            return await _context.Stocks.Include(s => s.Comments).ToListAsync(); // ToList is the defered execution
+            var stocks =  _context.Stocks.Include(s => s.Comments).AsQueryable(); // AsQueryable allows to add more queries before the sql is actually executed
+
+            if(!string.IsNullOrWhiteSpace(query.Symbol))
+            {
+                stocks = stocks.Where(s => s.Symbol.Contains(query.Symbol));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Company))
+            {
+                stocks = stocks.Where(s => s.Company.Contains(query.Company));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Industry))
+            {
+                stocks = stocks.Where(s => s.Industry.Contains(query.Industry));
+            }
+
+            return await stocks.ToListAsync(); // ToList is the defered execution. This is when the SQL query is actually run.
         }
 
         public async Task<Stock?> GetByIdAsync(int id)

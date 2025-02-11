@@ -1,11 +1,12 @@
-﻿using NetCoreWebAPIcLientAuth.Models;
+﻿using NetCoreWebAPIcLientAuth.Helpers;
+using NetCoreWebAPIcLientAuth.Models;
 using NetCoreWebAPIcLientAuth.ViewModels.Stock;
 
 namespace NetCoreWebAPIcLientAuth.Interfaces
 {
     public interface IStockRepository
     {
-        Task<List<Stock>> GetAllAsync();
+        Task<List<Stock>> GetAllAsync(QueryObject queryObject);
 
         Task<Stock?> GetByIdAsync(int id);
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetCoreWebAPIcLientAuth.Data;
+using NetCoreWebAPIcLientAuth.Helpers;
 using NetCoreWebAPIcLientAuth.Interfaces;
 using NetCoreWebAPIcLientAuth.Mappers;
 using NetCoreWebAPIcLientAuth.ViewModels.Stock;
@@ -19,9 +20,9 @@ namespace NetCoreWebAPIcLientAuth.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
-            var stocks = await _stockRepo.GetAllAsync();
+            var stocks = await _stockRepo.GetAllAsync(query);
             var stocksVM = stocks.Select(s => s.ToStockViewModel());
             return Ok(stocksVM);
         }
