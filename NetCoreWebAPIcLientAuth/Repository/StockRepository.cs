@@ -44,6 +44,9 @@ namespace NetCoreWebAPIcLientAuth.Repository
                 }
             }
 
+            var skipNumber= (query.PageNumber - 1) * query.PageSize;
+            stocks = stocks.Skip(skipNumber).Take(query.PageSize);
+
             return await stocks.ToListAsync(); // ToList is the defered execution. This is when the SQL query is actually run.
         }
 
