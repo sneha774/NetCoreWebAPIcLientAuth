@@ -36,6 +36,14 @@ namespace NetCoreWebAPIcLientAuth.Repository
                 stocks = stocks.Where(s => s.Industry.Contains(query.Industry));
             }
 
+            if(!string.IsNullOrEmpty(query.SortBy))
+            {
+                if(query.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase))
+                {
+                    stocks = query.IsDescending ? stocks.OrderByDescending(s => s.Symbol) : stocks.OrderBy(s => s.Symbol);
+                }
+            }
+
             return await stocks.ToListAsync(); // ToList is the defered execution. This is when the SQL query is actually run.
         }
 
